@@ -1,0 +1,18 @@
+{
+    "name": "gasless-forwarder",
+    "version": "1.0.0",
+    "description": "Gasless transaction forwarder using Hardhat",
+    "scripts": {
+      "compile": "hardhat compile",
+      "deploy": "hardhat run scripts/deploy.js --network goerli",
+      "verify": "hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS"
+    },
+    "dependencies": {
+      "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+      "@openzeppelin/contracts": "^5.0.0",
+      "dotenv": "^16.0.3",
+      "hardhat": "^3.0.0",
+      "ethers": "^6.5.2"
+    }
+  }
+  

@@ -1,59 +1,47 @@
-import { useState } from "react";
-import { useRouter } from "next/router"; // for redirection
-import styles from "../styles/Login.module.css";
+import { useState, useEffect } from "react";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
+  const [walletAddress, setWalletAddress] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    router.push("/main");
+  // Function to connect the wallet
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        setWalletAddress(accounts[0]);
+
+        // Store wallet address in local storage for persistence
+        localStorage.setItem("walletAddress", accounts[0]);
+      } catch (error) {
+        console.error("User denied wallet connection", error);
+      }
+    } else {
+      alert("Please install MetaMask or a Web3-compatible wallet.");
+    }
   };
 
-  return (
-    <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.loginBox}>
-          <h2>Login</h2>
-          <form onSubmit={handleSubmit}>
-            <div className={styles.inputBox}>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <label>Email</label>
-            </div>
-            <div className={styles.inputBox}>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <label>Password</label>
-            </div>
-            <div className={styles.forgotPass}>
-              <a href="#">Forgot your password?</a>
-            </div>
-            <button type="submit" className={styles.btn}>
-              Login
-            </button>
-            <div className={styles.signupLink}>
-              <p>
-                Have no account yet? <a href="#">Signup</a>
-              </p>
-            </div>
-          </form>
-        </div>
+  // Check if the wallet is already connected (after page reload)
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("walletAddress");
+    if (savedAddress) {
+      setWalletAddress(savedAddress);
+    }
+  }, []);
 
-        {[...Array(50)].map((_, index) => (
-          <span key={index} style={{ "--i": index }}></span>
-        ))}
-      </div>
+  return (
+    <div className="login-container">
+      <button onClick={connectWallet}>
+        {walletAddress ? `Connected: ${walletAddress}` : "Connect Wallet"}
+      </button>
+
+      {walletAddress && (
+        <div>
+          <p>Wallet Address: {walletAddress}</p>
+          <a href="/send">Proceed to Send Transaction</a>
+        </div>
+      )}
     </div>
   );
 }

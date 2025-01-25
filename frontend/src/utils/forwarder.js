@@ -1,40 +1,70 @@
-import { ethers } from "ethers";
+import { Wallet, keccak256, isAddress, getAddress, parseUnits, AbiCoder, toUtf8Bytes } from "ethers";
+import { JsonRpcProvider, Contract } from "ethers";
 
-const backendApiUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+// Load environment variables
+const contractAddress = process.env.NEXT_PUBLIC_FORWARDER_ADDRESS;
+const rpcUrl = process.env.NEXT_PUBLIC_INFURA_RPC_URL;
 
-export async function sendGaslessTransaction(recipient, amount) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const userAddress = await signer.getAddress();
+if (!rpcUrl || !contractAddress) {
+    throw new Error("Missing environment variables");
+}
 
-    // Prepare transaction request
-    const forwardRequest = {
-        from: userAddress,
-        to: recipient,
-        value: ethers.utils.parseEther(amount).toString(),
-        nonce: 0, // Ideally fetched from backend
-        data: "0x",
-    };
+// Setup provider and contract instance
+const provider = new JsonRpcProvider(rpcUrl);
 
-    // Hash the request
-    const hash = ethers.utils.solidityKeccak256(
-        ["address", "address", "uint256", "uint256", "bytes"],
-        [forwardRequest.from, forwardRequest.to, forwardRequest.value, forwardRequest.nonce, forwardRequest.data]
-    );
+const forwarderABI = [
+    "function owner() view returns (address)",
+    "function addRelayer(address _relayer) external",
+    "function executeTransaction(tuple(address from, address to, uint256 value, uint256 nonce, bytes data), bytes signature) external"
+];
 
-    // Sign the request with MetaMask
-    const signedMessage = await signer.signMessage(ethers.utils.arrayify(hash));
+const contract = new Contract(contractAddress, forwarderABI, provider);
 
-    // Send the transaction to the Go backend
-    const response = await fetch(`${backendApiUrl}/relay`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...forwardRequest, signed: signedMessage }),
-    });
-
-    if (!response.ok) {
-        throw new Error("Transaction relay failed");
+// Function to get contract owner
+export async function getOwner() {
+    try {
+        const owner = await contract.owner();
+        return owner;
+    } catch (error) {
+        console.error("Error fetching contract owner:", error);
+        return null;
     }
+}
 
-    return await response.json();
+// Function to send a gasless transaction
+export async function sendTransaction(to, value, data) {
+    try {
+        const wallet = new Wallet(process.env.NEXT_PUBLIC_PRIVATE_KEY, provider);
+        const contractWithSigner = contract.connect(wallet);
+
+        const nonce = 1;  // Increment based on past transactions
+        const formattedData = data && data.trim() !== "" ? data : "0x";
+
+        if (!isAddress(to)) {
+            throw new Error("Invalid recipient address");
+        }
+
+        const recipient = getAddress(to);
+        const formattedValue = parseUnits(value.toString(), "ether");
+
+        const abiCoder = AbiCoder.defaultAbiCoder();
+        const encodedData = abiCoder.encode(
+            ["address", "address", "uint256", "uint256", "bytes"],
+            [wallet.address, recipient, formattedValue, nonce, formattedData]
+        );
+
+        const messageHash = keccak256(toUtf8Bytes(encodedData));
+        const signature = await wallet.signMessage(toUtf8Bytes(messageHash));
+
+        const tx = await contractWithSigner.executeTransaction(
+            { from: wallet.address, to: recipient, value: formattedValue, nonce, data: formattedData },
+            signature
+        );
+
+        await tx.wait();
+        return tx.hash;
+    } catch (error) {
+        console.error("Error sending transaction:", error);
+        throw error;
+    }
 }

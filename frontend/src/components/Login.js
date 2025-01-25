@@ -1,18 +1,39 @@
+import { useState } from "react";
+import { useRouter } from "next/router"; // for redirection
 import styles from "../styles/Login.module.css";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    router.push("/main");
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.loginBox}>
           <h2>Login</h2>
-          <form action="#">
+          <form onSubmit={handleSubmit}>
             <div className={styles.inputBox}>
-              <input type="email" required />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
               <label>Email</label>
             </div>
             <div className={styles.inputBox}>
-              <input type="password" required />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
               <label>Password</label>
             </div>
             <div className={styles.forgotPass}>

@@ -10,11 +10,11 @@ import (
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found, relying on system environment variables")
 	}
 
 	privateKey := os.Getenv("PRIVATE_KEY")
 	if privateKey == "" {
-		log.Fatal("Private key not found in environment variables")
+		log.Fatal("PRIVATE_KEY not found in environment variables")
 	}
 }

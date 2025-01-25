@@ -2,8 +2,11 @@ package utils
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/big"
+	"net/http"
 	"os"
 	"strings"
 
@@ -186,4 +189,49 @@ func SendERC721Transaction(from, to, tokenID string, signed string) (string, err
 
 	fmt.Println("Transaction sent successfully:", signedTx.Hash().Hex())
 	return signedTx.Hash().Hex(), nil
+}
+
+// History of transactions
+
+type Transaction struct {
+	Hash      string `json:"hash"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Value     string `json:"value"`
+	GasUsed   string `json:"gasUsed"`
+	TimeStamp string `json:"timeStamp"`
+}
+
+type EtherscanResponse struct {
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
+	Result  []Transaction `json:"result"`
+}
+
+func GetTransactionHistory(address string) ([]Transaction, error) {
+	apiKey := os.Getenv("ETHERSCAN_API_KEY")
+	etherscanURL := fmt.Sprintf("https://api-sepolia.etherscan.io/api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&sort=desc&apikey=%s", address, apiKey)
+
+	response, err := http.Get(etherscanURL)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch transactions: %v", err)
+	}
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %v", err)
+	}
+
+	var etherscanResponse EtherscanResponse
+	err = json.Unmarshal(body, &etherscanResponse)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse etherscan response: %v", err)
+	}
+
+	if etherscanResponse.Status != "1" {
+		return nil, fmt.Errorf("error fetching transactions: %s", etherscanResponse.Message)
+	}
+
+	return etherscanResponse.Result, nil
 }

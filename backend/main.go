@@ -17,6 +17,7 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/relay", handlers.RelayTransaction)
+	router.GET("/history", handlers.GetTransactionHistory)
 
 	port := os.Getenv("PORT")
 	if port == "" {

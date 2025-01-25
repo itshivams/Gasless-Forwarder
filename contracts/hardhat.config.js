@@ -4,16 +4,12 @@ require("dotenv").config();
 module.exports = {
   solidity: "0.8.20",
   networks: {
-    goerli: {
-      url: process.env.GOERLI_URL || "",
-      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY}`] : [],
-    },
     sepolia: {
-      url: process.env.SEPOLIA_URL || "",
+      url: process.env.SEPOLIA_URL || "",  // Use Sepolia RPC URL
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [`0x${process.env.DEPLOYER_PRIVATE_KEY}`] : [],
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
-  }
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
 };

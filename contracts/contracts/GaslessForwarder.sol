@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
@@ -21,7 +21,7 @@ contract GaslessForwarder {
     }
 
     modifier onlyRelayer() {
-        require(relayers[msg.sender], "Not authorized relayer");
+        require(relayers[msg.sender], "Not an authorized relayer");
         _;
     }
 
@@ -41,14 +41,18 @@ contract GaslessForwarder {
 
     function executeTransaction(ForwardRequest calldata req, bytes calldata signature) external onlyRelayer {
         bytes32 messageHash = keccak256(abi.encode(req.from, req.to, req.value, req.nonce, req.data));
-        address recoveredSigner = messageHash.toEthSignedMessageHash().recover(signature);
-        
+
+        // Manually encode the Ethereum signed message
+        bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
+
+        address recoveredSigner = ECDSA.recover(ethSignedMessageHash, signature);
+
         require(recoveredSigner == req.from, "Invalid signature");
         require(nonces[req.from] == req.nonce, "Invalid nonce");
 
         nonces[req.from]++;
         (bool success,) = req.to.call{value: req.value}(req.data);
-        require(success, "Transaction execution failed");
+        require(success, "Transaction failed");
 
         emit TransactionForwarded(req.from, req.to, req.value, req.data);
     }

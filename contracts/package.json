@@ -8,12 +8,12 @@
         "verify": "hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS"
     },
     "dependencies": {
-        "@nomicfoundation/hardhat-toolbox": "^3.0.0",
-        "@openzeppelin/contracts": "^5.0.0",
-        "dotenv": "^16.0.3",
-        "ethers": "^6.5.2"
+        "@openzeppelin/contracts": "^5.0.0"
     },
     "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "dotenv": "^16.4.7",
+        "ethers": "^6.13.5",
         "hardhat": "^2.22.18"
     }
 }

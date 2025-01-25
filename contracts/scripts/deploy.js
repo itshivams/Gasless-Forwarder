@@ -1,10 +1,13 @@
 const hre = require("hardhat");
 
 async function main() {
-    const GaslessForwarder = await hre.ethers.getContractFactory("GaslessForwarder");
-    const forwarder = await GaslessForwarder.deploy();
-    await forwarder.deployed();
+    console.log("Deploying GaslessForwarder contract...");
 
+    // Ensure this matches your Solidity contract's name
+    const Forwarder = await hre.ethers.getContractFactory("GaslessForwarder");
+    const forwarder = await Forwarder.deploy();
+
+    await forwarder.deployed();
     console.log("Gasless Forwarder deployed to:", forwarder.address);
 }
 

@@ -8,6 +8,7 @@ import (
 	"gasless-forwarder-backend/handlers"
 	"gasless-forwarder-backend/utils"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,6 +16,8 @@ func main() {
 	utils.LoadEnv()
 
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	router.POST("/relay", handlers.RelayTransaction)
 	router.GET("/history", handlers.GetTransactionHistory)

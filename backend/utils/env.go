@@ -7,19 +7,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// LoadEnv loads environment variables from a .env file
 func LoadEnv() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-}
 
-// GetEnv retrieves an environment variable with a default fallback
-func GetEnv(key string, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
+	privateKey := os.Getenv("PRIVATE_KEY")
+	if privateKey == "" {
+		log.Fatal("Private key not found in environment variables")
 	}
-	return value
 }

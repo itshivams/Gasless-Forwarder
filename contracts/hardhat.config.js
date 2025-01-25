@@ -6,14 +6,14 @@ module.exports = {
     networks: {
         goerli: {
             url: process.env.INFURA_URL,
-            accounts: [process.env.DEPLOYER_PRIVATE_KEY]
+            accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`]
         },
         sepolia: {
             url: process.env.SEPOLIA_URL,
-            accounts: [process.env.DEPLOYER_PRIVATE_KEY]
-        },
+            accounts: [`0x${process.env.DEPLOYER_PRIVATE_KEY}`]
+        }
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY,
+        apiKey: process.env.ETHERSCAN_API_KEY
     }
 };

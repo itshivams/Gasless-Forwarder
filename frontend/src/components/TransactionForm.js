@@ -4,8 +4,8 @@ import styles from "../styles/TransectionForm.module.css";
 export default function TransactionForm() {
   return (
     <>
-      <Navbar />
       <div className={styles.container}>
+        <Navbar />
         <div className={styles.content}>
           <h1 className={styles.heading}>Welcome to Gasless Transactions</h1>
           <p className={styles.description}>
@@ -17,6 +17,7 @@ export default function TransactionForm() {
             <li>Send transactions for ERC-20 and ERC-721 tokens</li>
             <li>View transaction history</li>
           </ul>
+          <button className={styles.addWalletButton}>Add Wallet</button>
         </div>
       </div>
     </>

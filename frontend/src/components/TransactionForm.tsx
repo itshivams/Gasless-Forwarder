@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { ethers } from "ethers";
+import { ethers, BigNumberish } from "ethers";
 import { Web3Provider } from "@ethersproject/providers";
 
 interface TransactionFormProps {
@@ -78,6 +78,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
             description: "Please enter a valid amount",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
   
@@ -102,6 +103,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
             description: "Please enter a valid token ID",
             variant: "destructive",
           });
+          setIsLoading(false);
           return;
         }
   
@@ -110,7 +112,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         ];
   
         const contractAddress = "0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC"; 
-        const tokenId = amount;
+        const tokenId = Number(amount);
   
         const erc721Contract = new ethers.Contract(contractAddress, erc721Abi, signer as unknown as ethers.ContractRunner);
   
@@ -128,7 +130,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       console.error("Transaction error:", error);
       toast({
         title: "Transaction Failed",
-        description: "An error occurred during the transaction",
+        description: error.reason || "An error occurred during the transaction",
         variant: "destructive",
       });
     } finally {

@@ -41,16 +41,15 @@ contract GaslessForwarder {
 
     function executeTransaction(ForwardRequest calldata req, bytes calldata signature) external onlyRelayer {
         bytes32 messageHash = keccak256(abi.encode(req.from, req.to, req.value, req.nonce, req.data));
-
         bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
-        address recoveredSigner = ECDSA.recover(ethSignedMessageHash, signature);
+        address recoveredSigner = ethSignedMessageHash.recover(signature);
 
         require(recoveredSigner == req.from, "Invalid signature");
         require(nonces[req.from] == req.nonce, "Invalid nonce");
 
         nonces[req.from]++;
-        (bool success,) = req.to.call{value: req.value}(req.data);
+        (bool success, ) = req.to.call{value: req.value}(req.data);
         require(success, "Transaction failed");
 
         emit TransactionForwarded(req.from, req.to, req.value, req.data);

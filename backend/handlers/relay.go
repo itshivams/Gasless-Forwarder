@@ -2,52 +2,68 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
-
 	"gasless-forwarder-backend/utils"
+	"math/big"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-// incoming relay requests
-type ForwardRequest struct {
+// TransactionRequest represents the incoming JSON payload
+type TransactionRequest struct {
 	From      string `json:"from"`
 	To        string `json:"to"`
 	Value     string `json:"value"`
 	Nonce     uint64 `json:"nonce"`
 	Data      string `json:"data"`
 	Signed    string `json:"signed"`
-	TokenType string `json:"tokenType"`         // "erc20" or "erc721"
-	TokenID   string `json:"tokenId,omitempty"` // Only for ERC-721
+	TokenType string `json:"tokenType"`
 }
 
-func RelayTransaction(c *gin.Context) {
-	var req ForwardRequest
+// TransactionResponse represents the response format
+type TransactionResponse struct {
+	Message string `json:"message"`
+	TxHash  string `json:"txHash"`
+	Balance string `json:"balance"`
+}
 
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+// RelayTransaction processes and forwards the gasless transaction
+func RelayTransaction(c *gin.Context) {
+	var txReq TransactionRequest
+
+	if err := c.ShouldBindJSON(&txReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
 
-	fmt.Printf("Relaying %s transaction from %s to %s\n", req.TokenType, req.From, req.To)
-
-	var txHash string
-	var err error
-
-	switch req.TokenType {
-	case "erc20":
-		txHash, err = utils.SendERC20Transaction(req.From, req.To, req.Value, req.Signed)
-	case "erc721":
-		txHash, err = utils.SendERC721Transaction(req.From, req.To, req.TokenID, req.Signed)
-	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported token type"})
+	// Relay the signed transaction
+	txHash, err := utils.SendSignedTransaction(txReq.Signed)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Transaction failed: %v", err)})
 		return
+	}
+
+	// Get updated balance based on token type
+	var balance *big.Int
+	if txReq.TokenType == "erc20" {
+		balance, err = utils.GetERC20Balance(txReq.From)
+	} else if txReq.TokenType == "erc721" {
+		balance, err = utils.GetERC721Balance(txReq.From)
+	} else {
+		balance, err = utils.GetETHBalance(txReq.From)
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transaction failed", "details": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to get balance: %v", err)})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("%s transaction relayed successfully!", req.TokenType), "txHash": txHash})
+	// Prepare the response
+	response := TransactionResponse{
+		Message: fmt.Sprintf("%s transaction relayed successfully!", txReq.TokenType),
+		TxHash:  txHash,
+		Balance: balance.String(),
+	}
+
+	c.JSON(http.StatusOK, response)
 }

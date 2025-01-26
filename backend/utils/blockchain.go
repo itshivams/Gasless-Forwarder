@@ -16,6 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // To Get the current nonce for the given Ethereum address
@@ -234,4 +235,91 @@ func GetTransactionHistory(address string) ([]Transaction, error) {
 	}
 
 	return etherscanResponse.Result, nil
+}
+
+// get balance
+
+// Send a signed transaction
+func SendSignedTransaction(signedTx string) (string, error) {
+	client, err := rpc.Dial(os.Getenv("INFURA_RPC_URL"))
+	if err != nil {
+		return "", err
+	}
+
+	var txHash common.Hash
+	err = client.Call(&txHash, "eth_sendRawTransaction", signedTx)
+	if err != nil {
+		return "", err
+	}
+
+	return txHash.Hex(), nil
+}
+
+// Get ERC-20 token balance
+func GetERC20Balance(address string) (*big.Int, error) {
+	client, err := rpc.Dial(os.Getenv("INFURA_RPC_URL"))
+	if err != nil {
+		return nil, err
+	}
+
+	// Replace with your ERC-20 token contract address and balanceOf function signature
+	contractAddress := common.HexToAddress("0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC")
+	data := append([]byte{0x70, 0xa0, 0x82, 0x31}, common.HexToAddress(address).Bytes()...)
+
+	var result string
+	err = client.Call(&result, "eth_call", map[string]interface{}{
+		"to":   contractAddress.Hex(),
+		"data": common.Bytes2Hex(data),
+	}, "latest")
+
+	if err != nil {
+		return nil, err
+	}
+
+	balance := new(big.Int)
+	balance.SetString(result[2:], 16)
+	return balance, nil
+}
+
+// Get ETH balance
+func GetETHBalance(address string) (*big.Int, error) {
+	client, err := rpc.Dial(os.Getenv("INFURA_RPC_URL"))
+	if err != nil {
+		return nil, err
+	}
+
+	var balance string
+	err = client.Call(&balance, "eth_getBalance", address, "latest")
+	if err != nil {
+		return nil, err
+	}
+
+	balanceBigInt := new(big.Int)
+	balanceBigInt.SetString(balance[2:], 16)
+	return balanceBigInt, nil
+}
+
+// Get ERC-721 token balance
+func GetERC721Balance(address string) (*big.Int, error) {
+	client, err := rpc.Dial(os.Getenv("INFURA_RPC_URL"))
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress := common.HexToAddress("0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC")
+	data := append([]byte{0x70, 0xa0, 0x82, 0x31}, common.HexToAddress(address).Bytes()...)
+
+	var result string
+	err = client.Call(&result, "eth_call", map[string]interface{}{
+		"to":   contractAddress.Hex(),
+		"data": common.Bytes2Hex(data),
+	}, "latest")
+
+	if err != nil {
+		return nil, err
+	}
+
+	balance := new(big.Int)
+	balance.SetString(result[2:], 16)
+	return balance, nil
 }

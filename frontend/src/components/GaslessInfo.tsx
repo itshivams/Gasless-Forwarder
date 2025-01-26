@@ -167,7 +167,9 @@ export const GaslessInfo = ({ className = "", account }: GaslessInfoProps) => {
           </button>
         </div>
 
-        {ethPrice && <p className="mt-4 text-lg font-semibold">Current ETH Price: ${ethPrice}</p>}
+        {ethPrice &&  <div className="mt-4 p-4 rounded-lg bg-gray-100 text-gray-900">
+            <p className="text-lg font-semibold">Current ETH Price: ${ethPrice}</p>
+          </div>}
         {balance && (
           <div className="mt-4 p-4 rounded-lg bg-gray-100 text-gray-900">
             <p className="text-lg font-semibold">Balance: {balance} ETH</p>

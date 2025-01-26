@@ -58,7 +58,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xAA36A7" }], // Sepolia Test Network
+          params: [{ chainId: "0xAA36A7" }], 
         });
       } catch (error) {
         console.error("Error switching network:", error);
@@ -105,13 +105,12 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
           return;
         }
   
-        // ERC-721 ABI (to interact with NFT contract)
         const erc721Abi = [
           "function safeTransferFrom(address from, address to, uint256 tokenId) public",
         ];
   
-        const contractAddress = "0xYourERC721ContractAddress"; // Replace with the correct contract address
-        const tokenId = amount; // Token ID entered by the user
+        const contractAddress = "0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC"; 
+        const tokenId = amount;
   
         const erc721Contract = new ethers.Contract(contractAddress, erc721Abi, signer as unknown as ethers.ContractRunner);
   

@@ -129,7 +129,7 @@ export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) =
                   <StatusIcon status={tx.status} />
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {tx.value === "0" ? `NFT Transaction` : `${tx.value} Tokens`}
+                      {tx.value === "0" ? `NFT Transaction` : `${tx.value} Value`}
                     </p>
                     <p className="text-sm text-gray-500">To: {tx.to}</p>
                   </div>

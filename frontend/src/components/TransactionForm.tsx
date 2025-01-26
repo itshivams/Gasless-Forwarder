@@ -28,7 +28,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     if (!recipient || !isValidAddress(recipient)) {
       toast({
         title: "Invalid Recipient Address",
@@ -37,7 +37,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       });
       return;
     }
-
+  
     if (!provider) {
       toast({
         title: "Wallet Not Connected",
@@ -46,7 +46,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       });
       return;
     }
-
+  
     const network = await provider.getNetwork();
     if (network.chainId !== 11155111) {
       toast({
@@ -54,36 +54,77 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         description: "Please switch to the Sepolia Test Network.",
         variant: "destructive",
       });
-
+  
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xAA36A7" }],
+          params: [{ chainId: "0xAA36A7" }], // Sepolia Test Network
         });
       } catch (error) {
         console.error("Error switching network:", error);
         return;
       }
     }
-
+  
     setIsLoading(true);
-
+  
     try {
       const signer = provider.getSigner();
-      const tx = {
-        to: recipient,
-        value: ethers.parseUnits(amount, "ether"),
-      };
-
-      const txResponse = await signer.sendTransaction(tx);
-      await txResponse.wait();
-
-      toast({
-        title: "Transaction Successful",
-        description: `Transaction confirmed! Tx Hash: ${txResponse.hash}`,
-        variant: "default",
-        style: { backgroundColor: "#026e02", color: "white" },
-      });
+  
+      if (tokenType === "ERC20") {
+        if (!amount || isNaN(Number(amount))) {
+          toast({
+            title: "Invalid Amount",
+            description: "Please enter a valid amount",
+            variant: "destructive",
+          });
+          return;
+        }
+  
+        const tx = {
+          to: recipient,
+          value: ethers.parseUnits(amount, "ether"),
+        };
+  
+        const txResponse = await signer.sendTransaction(tx);
+        await txResponse.wait();
+  
+        toast({
+          title: "Transaction Successful",
+          description: `Transaction confirmed! \nTx Hash: ${txResponse.hash}`,
+          variant: "default",
+          style: { backgroundColor: "#026e02", color: "white" },
+        });
+      } else if (tokenType === "ERC721") {
+        if (!amount || isNaN(Number(amount))) {
+          toast({
+            title: "Invalid Token ID",
+            description: "Please enter a valid token ID",
+            variant: "destructive",
+          });
+          return;
+        }
+  
+        // ERC-721 ABI (to interact with NFT contract)
+        const erc721Abi = [
+          "function safeTransferFrom(address from, address to, uint256 tokenId) public",
+        ];
+  
+        const contractAddress = "0xYourERC721ContractAddress"; // Replace with the correct contract address
+        const tokenId = amount; // Token ID entered by the user
+  
+        const erc721Contract = new ethers.Contract(contractAddress, erc721Abi, signer as unknown as ethers.ContractRunner);
+  
+        const txResponse = await erc721Contract.safeTransferFrom(walletAddress, recipient, tokenId);
+        await txResponse.wait();
+  
+        toast({
+          title: "NFT Transfer Successful",
+          description: `NFT transferred successfully! Tx Hash: ${txResponse.hash}`,
+          variant: "default",
+          style: { backgroundColor: "#026e02", color: "white" },
+        });
+      }
     } catch (error) {
       console.error("Transaction error:", error);
       toast({
@@ -95,6 +136,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">

@@ -42,7 +42,6 @@ contract GaslessForwarder {
     function executeTransaction(ForwardRequest calldata req, bytes calldata signature) external onlyRelayer {
         bytes32 messageHash = keccak256(abi.encode(req.from, req.to, req.value, req.nonce, req.data));
 
-        // Manually encode the Ethereum signed message
         bytes32 ethSignedMessageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
 
         address recoveredSigner = ECDSA.recover(ethSignedMessageHash, signature);

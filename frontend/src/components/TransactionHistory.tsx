@@ -129,7 +129,7 @@ export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) =
                   <StatusIcon status={tx.status} />
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {tx.value === "0" ? `NFT Transaction` : `${tx.value} Value`}
+                      {tx.value === "0" ? `NFT Transaction` : `${tx.value} Values`}
                     </p>
                     <p className="text-sm text-gray-500">To: {tx.to}</p>
                   </div>
@@ -142,11 +142,7 @@ export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) =
                 </div>
               </div>
             ))}
-          </div>
-        </>
-      )}
-
-      {selectedTransaction && (
+                 {selectedTransaction && (
         <Dialog open={true} onOpenChange={() => setSelectedTransaction(null)}>
           <DialogContent className="max-w-2xl break-words">
             <DialogTitle>Transaction Details</DialogTitle>
@@ -160,6 +156,26 @@ export const TransactionHistory = ({ walletAddress }: TransactionHistoryProps) =
             </div>
           </DialogContent>
         </Dialog>
+      )}
+          </div>
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md bg-gray-200 text-gray-700"
+            >
+              Previous
+            </button>
+            <span>Page {currentPage}</span>
+            <button
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              disabled={currentPage * itemsPerPage >= filteredTransactions.length}
+              className="px-4 py-2 rounded-md bg-gray-200 text-gray-700"
+            >
+              Next
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

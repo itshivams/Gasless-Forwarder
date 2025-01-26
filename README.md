@@ -45,6 +45,30 @@ The solution consists of three main components:
 
 ## Setup Guide
 
+### Environment Variables
+
+#### Contracts
+Create a `.env` file in the `contracts` directory with the following content:
+```
+SEPOLIA_URL=https://sepolia.infura.io/v3/02084dda02bc47f78913a11ea476be56
+DEPLOYER_PRIVATE_KEY=your_secret_deployer_private_key
+ETHERSCAN_API_KEY=K1PCV6JTTPBVJBGNBPRNWED435CVBH5AJD
+```
+
+#### Backend
+Create a `.env` file in the `backend` directory with the following content:
+```
+INFURA_RPC_URL=https://sepolia.infura.io/v3/02084dda02bc47f78913a11ea476be56
+FORWARDER_CONTRACT_ADDRESS=0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC
+RELAYER_PRIVATE_KEY=you_relayer_private_secret_key
+PORT=4000
+PRIVATE_KEY=you_relayer_private_secret_key
+CHAIN_ID=11155111
+ERC721_CONTRACT_ADDRESS=0x8336Fe9c782C385D888DA4C3549Aa3AADb801FAC
+ETHERSCAN_API_KEY=K1PCV6JTTPBVJBGNBPRNWED435CVBH5AJD
+```
+
+
 ### Prerequisites
 Ensure you have the following installed:
 - Node.js (v18+)
@@ -141,7 +165,13 @@ We are a dedicated team of blockchain developers, cloud/backend developers, full
 
 ---
 
+## Project Demonstration
+Watch our project demonstration video here: [YouTube](https://youtu.be/pHNOJeRUE5U?si=BOO7bKruFSp5W5Tv)
+
+---
+
 ## Deployment
+Watch our project demonstration video here: [YouTube](https://youtu.be/pHNOJeRUE5U?si=BOO7bKruFSp5W5Tv)
 - **Backend:** Deployed on [Railway.app](https://backend-hackiitk.itshivam.me/)
 - **Frontend:** Deployed on [Vercel](https://hackiitk.itshivam.me)
 
@@ -149,6 +179,7 @@ We are a dedicated team of blockchain developers, cloud/backend developers, full
 
 ## Acknowledgment
 Special thanks to HACKIITK for organizing this hackathon.
+
 
 
 

@@ -135,7 +135,7 @@ const Index = () => {
               walletAddress={walletAddress} 
               provider={provider} 
             />
-            <GaslessInfo className="mt-8" />
+            <GaslessInfo className="mt-8" account={walletAddress}/>
           </div>
           <TransactionHistory walletAddress={walletAddress} />
         </div>

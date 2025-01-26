@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TransactionRequest represents the incoming JSON payload
 type TransactionRequest struct {
 	From      string `json:"from"`
 	To        string `json:"to"`
@@ -20,14 +19,12 @@ type TransactionRequest struct {
 	TokenType string `json:"tokenType"`
 }
 
-// TransactionResponse represents the response format
 type TransactionResponse struct {
 	Message string `json:"message"`
 	TxHash  string `json:"txHash"`
 	Balance string `json:"balance"`
 }
 
-// RelayTransaction processes and forwards the gasless transaction
 func RelayTransaction(c *gin.Context) {
 	var txReq TransactionRequest
 
@@ -36,14 +33,12 @@ func RelayTransaction(c *gin.Context) {
 		return
 	}
 
-	// Relay the signed transaction
 	txHash, err := utils.SendSignedTransaction(txReq.Signed)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Transaction failed: %v", err)})
 		return
 	}
 
-	// Get updated balance based on token type
 	var balance *big.Int
 	if txReq.TokenType == "erc20" {
 		balance, err = utils.GetERC20Balance(txReq.From)
@@ -58,7 +53,6 @@ func RelayTransaction(c *gin.Context) {
 		return
 	}
 
-	// Prepare the response
 	response := TransactionResponse{
 		Message: fmt.Sprintf("%s transaction relayed successfully!", txReq.TokenType),
 		TxHash:  txHash,

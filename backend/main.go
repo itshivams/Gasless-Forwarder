@@ -21,6 +21,7 @@ func main() {
 
 	router.POST("/relay", handlers.RelayTransaction)
 	router.GET("/history", handlers.GetTransactionHistory)
+	router.GET("/balance", handlers.GetBalance)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -29,6 +30,6 @@ func main() {
 
 	fmt.Printf("Server running on port %s\n", port)
 	if err := router.Run(":" + port); err != nil {
-		log.Fatal("Failed to start server:", err)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }

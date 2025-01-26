@@ -17,9 +17,8 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
   const [tokenType, setTokenType] = useState<"ERC20" | "ERC721">("ERC20");
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-
-  
 
   useEffect(() => {
     if (isWalletConnected) {
@@ -29,7 +28,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!recipient || !isValidAddress(recipient)) {
       toast({
         title: "Invalid Recipient Address",
@@ -38,7 +37,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       });
       return;
     }
-  
+
     if (!provider) {
       toast({
         title: "Wallet Not Connected",
@@ -47,7 +46,7 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
       });
       return;
     }
-  
+
     const network = await provider.getNetwork();
     if (network.chainId !== 11155111) {
       toast({
@@ -55,28 +54,30 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         description: "Please switch to the Sepolia Test Network.",
         variant: "destructive",
       });
-  
+
       try {
         await window.ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xAA36A7" }], // Sepolia chain ID in hex
+          params: [{ chainId: "0xAA36A7" }],
         });
       } catch (error) {
         console.error("Error switching network:", error);
         return;
       }
     }
-  
+
+    setIsLoading(true);
+
     try {
       const signer = provider.getSigner();
       const tx = {
         to: recipient,
         value: ethers.parseUnits(amount, "ether"),
       };
-  
+
       const txResponse = await signer.sendTransaction(tx);
       await txResponse.wait();
-  
+
       toast({
         title: "Transaction Successful",
         description: `Transaction confirmed! Tx Hash: ${txResponse.hash}`,
@@ -90,10 +91,10 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         description: "An error occurred during the transaction",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  
 
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -151,8 +152,8 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
           />
         </div>
 
-        <button type="submit" className="w-full rounded-lg bg-primary px-4 py-2 text-white">
-          Send Transaction
+        <button type="submit" className="w-full rounded-lg bg-primary px-4 py-2 text-white" disabled={isLoading}>
+          {isLoading ? "Processing..." : "Send Transaction"}
         </button>
       </form>
     </div>

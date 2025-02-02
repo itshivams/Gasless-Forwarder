@@ -40,6 +40,41 @@ func getAmoyBalance(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+func getTransactionHistory(c *gin.Context) {
+	apiKey := "TU2JRJ2YI1H9YKI5UDDYM4S4SCN5RFW7K2"
+	address := "0xf9aca397dbccda6b2dd8aa31e22c1787e4870937"
+	apiURL := fmt.Sprintf("https://api-amoy.polygonscan.com/api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&sort=desc&apikey=%s", address, apiKey)
+
+	resp, err := http.Get(apiURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transaction history from Polygonscan API"})
+		return
+	}
+	defer resp.Body.Close()
+
+	var data map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode response from Polygonscan API"})
+		return
+	}
+
+	result, ok := data["result"].([]interface{})
+	if ok {
+		for _, tx := range result {
+			if txMap, valid := tx.(map[string]interface{}); valid {
+				delete(txMap, "blockHash")
+				delete(txMap, "transactionIndex")
+				delete(txMap, "methodId")
+				delete(txMap, "functionName")
+				delete(txMap, "blockNumber")
+				delete(txMap, "input")
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, data)
+}
+
 func main() {
 	utils.LoadEnv()
 
@@ -51,6 +86,8 @@ func main() {
 	router.GET("/history", handlers.GetTransactionHistory)
 	router.GET("/balance", handlers.GetBalance)
 	router.GET("/amoybalance", getAmoyBalance)
+
+	router.GET("/transaction-history", getTransactionHistory)
 
 	port := os.Getenv("PORT")
 	if port == "" {

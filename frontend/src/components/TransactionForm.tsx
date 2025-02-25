@@ -86,10 +86,11 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
           to: recipient,
           value: ethers.parseUnits(amount, "ether"),
         };
-  
+
         const txResponse = await signer.sendTransaction(tx);
-        await txResponse.wait();
-  
+        const receipt = await txResponse.wait();
+        console.log("Gas used:", receipt.gasUsed.toString());
+
         toast({
           title: "Transaction Successful",
           description: `Transaction confirmed! \nTx Hash: ${txResponse.hash}`,

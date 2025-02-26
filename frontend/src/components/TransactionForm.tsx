@@ -88,7 +88,16 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         };
   
         const txResponse = await signer.sendTransaction(tx);
-        await txResponse.wait();
+        const receipt = await txResponse.wait();
+
+        console.log("Gas Used for ETH Transfer:", receipt.gasUsed.toString());
+
+toast({
+  title: "Transaction Successful",
+  description: `Transaction confirmed! \nTx Hash: ${txResponse.hash}\nGas Used: ${receipt.gasUsed.toString()}`,
+  variant: "default",
+  style: { backgroundColor: "#026e02", color: "white" },
+});
   
         toast({
           title: "Transaction Successful",
@@ -117,7 +126,17 @@ export const TransactionForm = ({ isWalletConnected, walletAddress, provider }: 
         const erc721Contract = new ethers.Contract(contractAddress, erc721Abi, signer as unknown as ethers.ContractRunner);
   
         const txResponse = await erc721Contract.safeTransferFrom(walletAddress, recipient, tokenId);
-        await txResponse.wait();
+        const receipt = await txResponse.wait();
+
+
+        console.log("Gas Used for ERC721 Transfer:", receipt.gasUsed.toString());
+
+toast({
+  title: "NFT Transfer Successful",
+  description: `NFT transferred successfully! \nTx Hash: ${txResponse.hash}\nGas Used: ${receipt.gasUsed.toString()}`,
+  variant: "default",
+  style: { backgroundColor: "#026e02", color: "white" },
+});
   
         toast({
           title: "NFT Transfer Successful",

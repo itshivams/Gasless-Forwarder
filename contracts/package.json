@@ -8,7 +8,8 @@
         "verify": "hardhat verify --network goerli DEPLOYED_CONTRACT_ADDRESS"
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^5.2.0"
+        "@openzeppelin/contracts": "^5.2.0",
+        "cli-table3": "^0.6.5"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-toolbox": "^5.0.0",

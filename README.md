@@ -150,20 +150,6 @@ Gasless-Forwarder-main/
 
 ---
 
-## Our Team
-We are a dedicated team of blockchain developers, cloud/backend developers, full stack developers, software engineers, and security experts passionate about decentralized finance and improving blockchain accessibility. Our goal is to create seamless, secure, and efficient blockchain solutions.
-
-- [Shivam](https://github.com/myselfshivams)
-- [Ritik Gupta](https://github.com/ritikgupta06)
-- [Sanskar Soni](https://github.com/sunscar-sony)
-- [Parth Agarwal](https://github.com/TheInfernitex)
-- [Ashish Verma](https://github.com/AshishJii)
-
-
-
-[![Contributors](https://contrib.rocks/image?repo=myselfshivams/Gasless-Forwarder)](https://github.com/myselfshivams/Gasless-Forwarder/contributors)
-
----
 
 ## Project Demonstration
 Watch our project demonstration video here: [YouTube](https://youtu.be/pHNOJeRUE5U?si=BOO7bKruFSp5W5Tv)
@@ -179,7 +165,19 @@ Watch our project demonstration video here: [YouTube](https://youtu.be/pHNOJeRUE
 
 ## Acknowledgment
 Special thanks to HACKIITK for organizing this hackathon.
+## Our Team
+We are a dedicated team of blockchain developers, cloud/backend developers, full stack developers, software engineers, and security experts passionate about decentralized finance and improving blockchain accessibility. Our goal is to create seamless, secure, and efficient blockchain solutions.
+
+- [Shivam](https://github.com/myselfshivams)
+- [Ritik Gupta](https://github.com/ritikgupta06)
+- [Sanskar Soni](https://github.com/sunscar-sony)
+- [Parth Agarwal](https://github.com/TheInfernitex)
+- [Ashish Verma](https://github.com/AshishJii)
 
 
+  <div align="center">
+        <a href="https://github.com/itshivams"><img src="https://itshivam.in/api/github-contributors?repo=itshivams/Gasless-Forwarder&theme=neon&layout=carousel" height="240" /></a>
+    </div>
 
+---
 
